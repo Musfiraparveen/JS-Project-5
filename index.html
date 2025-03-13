@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Math Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Coda:wght@400;800&family=Jost:ital,wght@0,100..900;1,100..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+    }
+
+    .quiz-container {
+      background-color: #312c2c;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+      width: 400px;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 26px;
+      color: goldenrod;
+      text-shadow: -2px -2px 2px rgba(255, 215, 0, 0.4), 2px 2px 3px rgba(0, 0, 0, 0.9);
+    }
+
+    .question {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #bcb8b1;
+      font-weight: bold;
+    }
+
+    .input-field {
+      font-size: 18px;
+      padding: 10px;
+      width: 70%;
+      text-align: center;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      outline: none;
+      transition: border-color 0.3s;
+      background-color: #00000017;
+      color: #e7d1c9;
+    }
+
+    div#attemptedDisplay {
+      margin-bottom: 10px;
+    }
+
+    .input-field:focus {
+      border-color: white;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    button {
+      background-color: #af8f50;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 1s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #c6a86c;
+    }
+
+    .correct {
+      color: #6a994e;
+    }
+
+    .incorrect {
+      color: #e74c3c;
+    }
+
+    .score-time {
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      color: gray;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+
+    #backgroundVideo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+  </style>
+</head>
+
+<body>
+  <video id="backgroundVideo" autoplay loop muted>
+    <source src="video1.mp4" type="video/mp4"> <!-- Replace with your video file -->
+  </video>
+  <div class="quiz-container">
+    <h1>✨ Math Quiz Game ✨</h1>
+    <div class="score-time">
+      <div id="scoreDisplay">Score: 0</div>
+      <div id="timerDisplay">Time Left: 1:00</div>
+    </div>
+    <div id="attemptedDisplay">
+      <p>Questions Attempted: 0</p>
+    </div>
+    <div class="question" id="question">5 + 3 = ?</div>
+    <input type="text" class="input-field" id="answer" placeholder="Your answer">
+    <div class="result" id="result"></div>
+    <button id="restartButton">Restart Game</button>
+    <button id="nextButton" onclick="generateNewQuestion()">Next Question</button>
+
+  </div>
+
+  <script>
+    let score = 0;
+    let timeLeft = 60;
+    let totalQuestions = 0;
+    let currentQuestion;
+    let timer;
+
+    const questionElement = document.getElementById('question');
+    const answerInput = document.getElementById('answer');
+    const resultElement = document.getElementById('result');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const attemptedDisplay = document.getElementById('attemptedDisplay');
+
+    function generateQuestion() {
+      const num1 = Math.floor(Math.random() * 10);
+      const num2 = Math.floor(Math.random() * 10);
+      const operator = ['+', '-', '*'][Math.floor(Math.random() * 3)];
+      const question = `${num1} ${operator} ${num2} = ?`;
+      const correctAnswer = eval(`${num1} ${operator} ${num2}`);
+      console.log(`Generated Question: ${question}, Correct Answer: ${correctAnswer}`);
+      return { question, correctAnswer };
+    }
+
+    function startTimer() {
+      updateTimerDisplay();
+      timer = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        console.log(`Time Left: ${timeLeft}s`);
+
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          console.log("Timer Ended! Game Over.");
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerDisplay.textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    function endGame() {
+      answerInput.disabled = true;
+      console.log(`Game Over! Final Score: ${score}, Questions Attempted: ${totalQuestions}`);
+      resultElement.innerHTML = `
+        Game Over!<br>
+        Questions Attempted: ${totalQuestions}<br>
+        Final Score: ${score}
+      `;
+      resultElement.className = "result correct";
+    }
+
+    answerInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        const userAnswer = parseInt(answerInput.value, 10);
+        ++totalQuestions;
+        attemptedDisplay.textContent = `Questions Attempted: ${totalQuestions}`;
+        console.log(`User Answered: ${userAnswer}, Correct Answer: ${currentQuestion.correctAnswer}`);
+
+        if (userAnswer === currentQuestion.correctAnswer) {
+          console.log("Correct Answer! 🎉");
+          resultElement.textContent = 'Correct! 🎉';
+          resultElement.className = "result correct";
+          score++;
+          scoreDisplay.textContent = `Score: ${score}`;
+        } else {
+          console.log(`Incorrect Answer! ❌ Correct Answer was: ${currentQuestion.correctAnswer}`);
+          resultElement.textContent = `Incorrect! The correct answer was ${currentQuestion.correctAnswer}.`;
+          resultElement.className = "result incorrect";
+        }
+
+        setTimeout(() => {
+          generateNewQuestion();
+        }, 1500);
+      }
+    });
+
+    function generateNewQuestion() {
+      currentQuestion = generateQuestion();
+      questionElement.textContent = currentQuestion.question;
+      answerInput.value = '';
+      answerInput.disabled = false;
+      answerInput.focus();
+      resultElement.textContent = '';
+      console.log("New Question Generated!");
+    }
+
+    document.getElementById('restartButton').addEventListener('click', function () {
+      timeLeft = 60;
+      answerInput.disabled = false;
+      resultElement.textContent = '';
+      clearInterval(timer);
+      console.log("Game Restarted!");
+      initGame();
+    });
+
+    function initGame() {
+      score = 0;
+      totalQuestions = 0;
+      scoreDisplay.textContent = `Score: ${score}`;
+      attemptedDisplay.textContent = `Questions Attempted: ${totalQuestions}`;
+      generateNewQuestion();
+      startTimer();
+      console.log("Game Initialized! ⏳");
+    }
+
+    initGame();
+
+  </script>
+</body>
+
+</html>
