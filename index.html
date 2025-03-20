@@ -158,8 +158,11 @@
 
     function generateQuestion() {
       const num1 = Math.floor(Math.random() * 10);
+      console.log("num1", num1);
       const num2 = Math.floor(Math.random() * 10);
+      console.log("num2", num2);
       const operator = ['+', '-', '*'][Math.floor(Math.random() * 3)];
+      console.log("operator", operator);
       const question = `${num1} ${operator} ${num2} = ?`;
       const correctAnswer = eval(`${num1} ${operator} ${num2}`);
       console.log(`Generated Question: ${question}, Correct Answer: ${correctAnswer}`);
@@ -183,7 +186,9 @@
 
     function updateTimerDisplay() {
       const minutes = Math.floor(timeLeft / 60);
+      console.log("minutes", minutes);
       const seconds = timeLeft % 60;
+      console.log("seconds", seconds);
       timerDisplay.textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }
 
@@ -203,6 +208,8 @@
         const userAnswer = parseInt(answerInput.value, 10);
         ++totalQuestions;
         attemptedDisplay.textContent = `Questions Attempted: ${totalQuestions}`;
+        console.log("currentQuestion", currentQuestion);
+
         console.log(`User Answered: ${userAnswer}, Correct Answer: ${currentQuestion.correctAnswer}`);
 
         if (userAnswer === currentQuestion.correctAnswer) {
